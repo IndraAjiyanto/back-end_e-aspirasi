@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\Aspirasi;
 use CodeIgniter\Controller;
 use CodeIgniter\Exceptions\PageNotFoundException;
+use App\Controllers\BaseController;
 
 class AspirasiController extends BaseController
 {
