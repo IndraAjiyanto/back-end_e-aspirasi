@@ -10,19 +10,13 @@ use App\Controllers\BaseController;
 class JawabanController extends BaseController
 {
     protected $jawabanModel;
+    protected $aspirasiModel;
 
     public function __construct()
     {
         $this->jawabanModel = new Jawaban();
+        $this->aspirasiModel = new Aspirasi();
     }
-
-  
-    public function index()
-    {
-        $data['jawaban'] = $this->jawabanModel->findAll();
-        return $this->response->setJSON($data);
-    }
-
   
     public function create()
     {
@@ -36,11 +30,17 @@ class JawabanController extends BaseController
             return $this->response->setJSON(['errors' => $validation->getErrors()]);
         }
 
-        $this->jawabanModel->insert([
+        $prosesJawab = $this->jawabanModel->insert([
             'isi'           => $this->request->getVar('isi'),
             'aspirasi_id'       => $this->request->getVar('aspirasi_id'),
             'created_at'    => date('Y-m-d H:i:s')
         ]);
+
+        if($prosesJawab){
+            $this->aspirasiModel->update($this->request->getVar('aspirasi_id'), [
+                'status' => 'Dijawab'
+            ]);
+        }
 
         return $this->response->setJSON(['message' => 'Jawaban berhasil dikirim']);
     }
@@ -50,6 +50,13 @@ class JawabanController extends BaseController
         return $this->response->setJSON($data);
     }
 
+    public function edit($id){
+        $jawaban = $this->jawabanModel->find($id);
+        if (!$jawaban) {
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'Data tidak ditemukan']);
+        }
+        return $this->response->setJSON($jawaban);
+    }
 
     public function update($id)
     {

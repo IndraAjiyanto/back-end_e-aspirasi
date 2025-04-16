@@ -11,7 +11,7 @@ $routes->get('/', 'Home::index');
 // $routes->get('/aspirasi/edit/(:num)', 'AspirasiController::edit/$1');
 // $routes->post('/aspirasi/update/(:num)', 'AspirasiController::update/$1');
 // $routes->post('/aspirasi/delete/(:num)', 'AspirasiController::delete/$1');
-$routes->post('/aspirasi/status/(:num)', 'AspirasiController::updateStatus/$1');
+// $routes->post('/aspirasi/status/(:num)', 'AspirasiController::updateStatus/$1');
 
 $routes->resource('aspirasi', ['controller' => 'AspirasiController']);
 $routes->resource('jawaban', ['controller' => 'JawabanController']);

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Unit;
+use App\Models\Jawaban;
 use App\Models\Aspirasi;
 use CodeIgniter\Controller;
 use App\Controllers\BaseController;
@@ -11,11 +12,14 @@ use CodeIgniter\Exceptions\PageNotFoundException;
 class AspirasiController extends BaseController
 {
     protected $aspirasiModel;
+    protected $unitModel;
+    protected $jawabanModel;
 
     public function __construct()
     {
         $this->aspirasiModel = new Aspirasi();
         $this->unitModel = new Unit();
+        $this->jawabanModel = new Jawaban();
     }
 
   
@@ -57,6 +61,7 @@ class AspirasiController extends BaseController
 
     public function show($id){
         $data['aspirasi'] = $this->aspirasiModel->find($id);
+        $data['jawaban'] = $this->aspirasiModel->where('aspirasi_id', $id)->first();
         return $this->response->setJSON($data);
     }
 

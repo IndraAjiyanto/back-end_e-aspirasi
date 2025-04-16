@@ -8,6 +8,9 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class UnitController extends BaseController
 {
+    protected $unitModel;
+    protected $aspirasiModel;
+
     public function __construct()
     {
         $this->unitModel = new Unit();
