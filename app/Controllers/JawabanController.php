@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Controllers;
-use CodeIgniter\Controller;
 use App\Models\Jawaban;
-use CodeIgniter\Exceptions\PageNotFoundException;
+use App\Models\Aspirasi;
+use CodeIgniter\Controller;
 use App\Controllers\BaseController;
+use CodeIgniter\Exceptions\PageNotFoundException;
 
 
 class JawabanController extends BaseController

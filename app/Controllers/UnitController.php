@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Unit;
+use App\Models\Aspirasi;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
