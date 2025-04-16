@@ -2,10 +2,11 @@
 
 namespace App\Controllers;
 
+use App\Models\Unit;
 use App\Models\Aspirasi;
 use CodeIgniter\Controller;
-use CodeIgniter\Exceptions\PageNotFoundException;
 use App\Controllers\BaseController;
+use CodeIgniter\Exceptions\PageNotFoundException;
 
 class AspirasiController extends BaseController
 {
@@ -14,6 +15,7 @@ class AspirasiController extends BaseController
     public function __construct()
     {
         $this->aspirasiModel = new Aspirasi();
+        $this->unitModel = new Unit();
     }
 
   
@@ -23,7 +25,12 @@ class AspirasiController extends BaseController
         return $this->response->setJSON($data);
     }
 
-  
+    public function insert(){
+        $data['unit'] = $this->unitModel->findAll();
+        return $this->response->setJSON($data);
+    }
+
+
     public function create()
     {
         $validation = \Config\Services::validation();
@@ -38,14 +45,27 @@ class AspirasiController extends BaseController
         }
 
         $this->aspirasiModel->insert([
-            'mahasiswa_nim' => $this->request->getPost('mahasiswa_nim'),
-            'isi'           => $this->request->getPost('isi'),
-            'unit_id'       => $this->request->getPost('unit_id'),
+            'mahasiswa_nim' => $this->request->getVar('mahasiswa_nim'),
+            'isi'           => $this->request->getVar('isi'),
+            'unit_id'       => $this->request->getVar('unit_id'),
             'status'        => 'belum diproses',
             'created_at'    => date('Y-m-d H:i:s')
         ]);
 
         return $this->response->setJSON(['message' => 'Aspirasi berhasil dikirim']);
+    }
+
+    public function show($id){
+        $data['aspirasi'] = $this->aspirasiModel->find($id);
+        return $this->response->setJSON($data);
+    }
+
+    public function edit($id){
+        $aspirasi = $this->aspirasiModel->find($id);
+        if (!$aspirasi) {
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'Data tidak ditemukan']);
+        }
+        return $this->response->setJSON($aspirasi);
     }
 
 
@@ -57,8 +77,8 @@ class AspirasiController extends BaseController
         }
 
         $this->aspirasiModel->update($id, [
-            'isi'        => $this->request->getPost('isi'),
-            'unit_id'    => $this->request->getPost('unit_id'),
+            'isi'        => $this->request->getVar('isi'),
+            'unit_id'    => $this->request->getVar('unit_id'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 

@@ -37,12 +37,17 @@ class JawabanController extends BaseController
         }
 
         $this->jawabanModel->insert([
-            'isi'           => $this->request->getPost('isi'),
-            'aspirasi_id'       => $this->request->getPost('aspirasi_id'),
+            'isi'           => $this->request->getVar('isi'),
+            'aspirasi_id'       => $this->request->getVar('aspirasi_id'),
             'created_at'    => date('Y-m-d H:i:s')
         ]);
 
         return $this->response->setJSON(['message' => 'Jawaban berhasil dikirim']);
+    }
+
+    public function show($id){
+        $data['jawaban'] = $this->jawabanModel->find($id);
+        return $this->response->setJSON($data);
     }
 
 
@@ -54,8 +59,8 @@ class JawabanController extends BaseController
         }
 
         $this->jawabanModel->update($id, [
-            'isi'        => $this->request->getPost('isi'),
-            'aspirasi_id'    => $this->request->getPost('aspirasi_id'),
+            'isi'        => $this->request->getVar('isi'),
+            'aspirasi_id'    => $this->request->getVar('aspirasi_id'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
