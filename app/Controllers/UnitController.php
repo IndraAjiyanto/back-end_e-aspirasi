@@ -18,6 +18,11 @@ class UnitController extends BaseController
         $this->aspirasiModel = new Aspirasi();
     }
 
+    public function index(){
+            $data = $this->unitModel->findAll();
+            return $this->response->setJSON($data);
+    }
+
     public function show($id){
         $data['unit'] = $this->unitModel->find($id);
         $data['aspirasi'] = $this->aspirasiModel->where('unit_id', $id)->findAll();

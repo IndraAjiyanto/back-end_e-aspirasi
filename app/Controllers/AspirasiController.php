@@ -22,18 +22,19 @@ class AspirasiController extends BaseController
         $this->jawabanModel = new Jawaban();
     }
 
-  
     public function index()
     {
-        $data['aspirasi'] = $this->aspirasiModel->findAll();
+        $aspirasis = $this->aspirasiModel->findAll();
+        $data = [];
+
+        foreach ($aspirasis as $aspirasi) {
+            $unit = $this->unitModel->find($aspirasi['unit_id']);
+            $aspirasi['unit_nama'] = $unit ? $unit['nama'] : 'Tidak diketahui';
+            $data[] = $aspirasi;
+        }
+    
         return $this->response->setJSON($data);
     }
-
-    public function insert(){
-        $data['unit'] = $this->unitModel->findAll();
-        return $this->response->setJSON($data);
-    }
-
 
     public function create()
     {
@@ -41,7 +42,7 @@ class AspirasiController extends BaseController
         $validation->setRules([
             'mahasiswa_nim' => 'required',
             'isi'           => 'required',
-            'unit_id'       => 'required'
+            'unit_id'       => 'required',
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {

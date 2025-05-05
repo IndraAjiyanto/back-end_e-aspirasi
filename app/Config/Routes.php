@@ -14,11 +14,11 @@ $routes->get('/', 'Home::index');
 // $routes->post('/aspirasi/status/(:num)', 'AspirasiController::updateStatus/$1');
 
 $routes->resource('aspirasi', ['controller' => 'AspirasiController']);
-$routes->resource('jawaban', ['controller' => 'JawabanController']);
+$routes->resource('jawaban', ['controller' => 'JawabanController', 'filter' => 'role:admin']);
 $routes->resource('unit', ['controller' => 'UnitController']);
 
 // $routes->get('/jawaban', 'JawabanController::index');
 // $routes->post('/jawaban', 'JawabanController::create');
 // $routes->get('/jawaban/edit/(:num)', 'JawabanController::edit/$1');
 // $routes->post('/jawaban/update/(:num)', 'JawabanController::update/$1');
-// $routes->post('/jawaban', 'JawabanController::delete');
+// $routes->post('/jawabanan', 'JawabanController::delete','updtstatsu');
