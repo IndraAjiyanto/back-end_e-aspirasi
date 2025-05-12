@@ -85,9 +85,9 @@ class AspirasiController extends BaseController
         }
 
         $this->aspirasiModel->update($id, [
+            'mahasiswa_nim'        => $this->request->getVar('mahasiswa_nim'),
             'isi'        => $this->request->getVar('isi'),
             'unit_id'    => $this->request->getVar('unit_id'),
-            'updated_at' => date('Y-m-d H:i:s')
         ]);
 
         return $this->response->setJSON(['message' => 'Aspirasi berhasil diupdate']);
