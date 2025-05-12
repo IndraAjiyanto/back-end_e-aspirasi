@@ -40,13 +40,15 @@ class AspirasiController extends BaseController
     {
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'mahasiswa_nim' => 'required',
+            'mahasiswa_nim' => 'required|is_not_unique[mahasiswa.nim]',
             'isi'           => 'required',
             'unit_id'       => 'required',
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
-            return $this->response->setJSON(['errors' => $validation->getErrors()]);
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $validation->getErrors()])->setStatusCode(422);
         }
 
         $this->aspirasiModel->insert([
@@ -57,7 +59,7 @@ class AspirasiController extends BaseController
             'created_at'    => date('Y-m-d H:i:s')
         ]);
 
-        return $this->response->setJSON(['message' => 'Aspirasi berhasil dikirim']);
+        return $this->response->setJSON(['status' => 'success']);
     }
 
     public function show($id){
