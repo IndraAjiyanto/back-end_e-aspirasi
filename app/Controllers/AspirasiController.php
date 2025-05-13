@@ -24,7 +24,7 @@ class AspirasiController extends BaseController
 
     public function index()
     {
-        $aspirasis = $this->aspirasiModel->findAll();
+        $aspirasis = $this->aspirasiModel->orderBy('created_at', 'asc')->findAll();
         $data = [];
 
         foreach ($aspirasis as $aspirasi) {
@@ -55,7 +55,7 @@ class AspirasiController extends BaseController
             'mahasiswa_nim' => $this->request->getVar('mahasiswa_nim'),
             'isi'           => $this->request->getVar('isi'),
             'unit_id'       => $this->request->getVar('unit_id'),
-            'status'        => 'belum diproses',
+            'status'        => 'diproses',
             'created_at'    => date('Y-m-d H:i:s')
         ]);
 
@@ -64,7 +64,7 @@ class AspirasiController extends BaseController
 
     public function show($id){
         $data['aspirasi'] = $this->aspirasiModel->find($id);
-        $data['jawaban'] = $this->jawabanModel->where('aspirasi_id', $id)->first();
+        $data['jawaban'] = $this->jawabanModel->where('aspirasi_id', $id)->orderBy('created_at', 'asc')->findAll();
         return $this->response->setJSON($data);
     }
 
@@ -103,6 +103,10 @@ class AspirasiController extends BaseController
         return $this->response->setJSON(['message' => 'Aspirasi berhasil dihapus']);
     }
 
+    public function getAspirasiUnit($unit){
+        $aspirasi = $this->aspirasiModel->where('unit_id', $unit)->orderBy('created_at', 'asc')->findAll();
+        return $this->response->setJSON($aspirasi);
+    }
 
     public function updateStatus($id)
     {

@@ -24,7 +24,8 @@ class JawabanController extends BaseController
         $validation = \Config\Services::validation();
         $validation->setRules([
             'isi'           => 'required',
-            'aspirasi_id' => 'required'
+            'aspirasi_id'   => 'required',
+            'status'        => 'required'
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
@@ -39,7 +40,7 @@ class JawabanController extends BaseController
 
         if($prosesJawab){
             $this->aspirasiModel->update($this->request->getVar('aspirasi_id'), [
-                'status' => 'Dijawab'
+                'status' => $this->request->getVar('status')
             ]);
         }
 
