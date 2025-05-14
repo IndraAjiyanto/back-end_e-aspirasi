@@ -103,10 +103,6 @@ class AspirasiController extends BaseController
         return $this->response->setJSON(['message' => 'Aspirasi berhasil dihapus']);
     }
 
-    public function getAspirasiUnit($unit){
-        $aspirasi = $this->aspirasiModel->where('unit_id', $unit)->orderBy('created_at', 'asc')->findAll();
-        return $this->response->setJSON($aspirasi);
-    }
 
     public function updateStatus($id)
     {

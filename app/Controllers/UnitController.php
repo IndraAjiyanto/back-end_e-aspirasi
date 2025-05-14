@@ -28,4 +28,9 @@ class UnitController extends BaseController
         $data['aspirasi'] = $this->aspirasiModel->where('unit_id', $id)->findAll();
         return $this->response->setJSON($data);
     }
+
+        public function getAspirasiUnit($unit){
+        $aspirasi = $this->aspirasiModel->where('unit_id', $unit)->orderBy('created_at', 'asc')->findAll();
+        return $this->response->setJSON($aspirasi);
+    }
 }

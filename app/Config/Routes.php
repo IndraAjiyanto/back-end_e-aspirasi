@@ -12,10 +12,11 @@ $routes->get('/', 'Home::index');
 // $routes->post('/aspirasi/update/(:num)', 'AspirasiController::update/$1');
 // $routes->post('/aspirasi/delete/(:num)', 'AspirasiController::delete/$1');
 // $routes->post('/aspirasi/status/(:num)', 'AspirasiController::updateStatus/$1');
-$routes->get('/aspirasi/akademik/(:num)','AspirasiController::getAspirasiUnit/$1');
 $routes->resource('aspirasi', ['controller' => 'AspirasiController']);
 $routes->resource('jawaban', ['controller' => 'JawabanController']);
+$routes->get('/unit/aspirasi/(:num)','UnitController::getAspirasiUnit/$1');
 $routes->resource('unit', ['controller' => 'UnitController']);
+
 
 // $routes->get('/jawaban', 'JawabanController::index');
 // $routes->post('/jawaban', 'JawabanController::create');
