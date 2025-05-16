@@ -18,6 +18,11 @@ class JawabanController extends BaseController
         $this->jawabanModel = new Jawaban();
         $this->aspirasiModel = new Aspirasi();
     }
+
+    public function jawabanUnit($id){
+        $jawaban = $this->jawabanModel->where('aspirasi_id', $id)->findAll();
+        return $this->response->setJSON($jawaban);
+    }
   
     public function create()
     {

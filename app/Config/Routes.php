@@ -13,6 +13,7 @@ $routes->get('/', 'Home::index');
 // $routes->post('/aspirasi/delete/(:num)', 'AspirasiController::delete/$1');
 // $routes->post('/aspirasi/status/(:num)', 'AspirasiController::updateStatus/$1');
 $routes->resource('aspirasi', ['controller' => 'AspirasiController']);
+$routes->get('/jawaban/aspirasi/(:num)', 'JawabanController::jawabanUnit/$1');
 $routes->resource('jawaban', ['controller' => 'JawabanController']);
 $routes->get('/unit/aspirasi/(:num)','UnitController::getAspirasiUnit/$1');
 $routes->resource('unit', ['controller' => 'UnitController']);
