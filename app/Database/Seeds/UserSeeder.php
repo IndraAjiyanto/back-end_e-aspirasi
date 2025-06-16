@@ -2,6 +2,7 @@
 
 namespace App\Database\Seeds;
 
+
 use CodeIgniter\Database\Seeder;
 use Myth\Auth\Models\UserModel;
 use Myth\Auth\Models\GroupModel;
@@ -11,6 +12,7 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
+
         $userModel  = new UserModel();
         $groupModel = new GroupModel();
 
@@ -79,5 +81,6 @@ class UserSeeder extends Seeder
         $groupModel->addUserToGroup($mhs2ID, $mhsGroupId);
 
         echo "Seeder berhasil dijalankan! 🎉\n";
+
     }
 }

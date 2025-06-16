@@ -3,6 +3,7 @@
 namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
+
 use Myth\Auth\Models\PermissionModel;
 use Myth\Auth\Models\GroupModel;
 
@@ -10,6 +11,7 @@ class GroupSeeder extends Seeder
 {
     public function run()
     {
+
         $groups = new GroupModel();
         $groups->skipValidation(true); 
 
@@ -38,5 +40,6 @@ class GroupSeeder extends Seeder
             $groups->addPermissionToGroup($adminPermission->id, $mahasiswaGroupID);
         }
         
+
     }
 }

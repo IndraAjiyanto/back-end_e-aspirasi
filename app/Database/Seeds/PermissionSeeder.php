@@ -3,12 +3,14 @@
 namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
+
 use Myth\Auth\Models\PermissionModel;
 
 class PermissionSeeder extends Seeder
 {
     public function run()
     {
+
         $permissions = new PermissionModel();
         $permissions->skipValidation(true);
 
@@ -23,3 +25,4 @@ class PermissionSeeder extends Seeder
         ]);
     }
 }
+

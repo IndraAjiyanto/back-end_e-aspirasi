@@ -24,46 +24,49 @@ class AspirasiController extends BaseController
         $this->jawabanModel = new Jawaban();
     }
 
-  
     public function index()
     {
-        $data['aspirasi'] = $this->aspirasiModel->findAll();
+        $aspirasis = $this->aspirasiModel->orderBy('created_at', 'asc')->findAll();
+        $data = [];
+
+        foreach ($aspirasis as $aspirasi) {
+            $unit = $this->unitModel->find($aspirasi['unit_id']);
+            $aspirasi['unit_nama'] = $unit ? $unit['nama'] : 'Tidak diketahui';
+            $data[] = $aspirasi;
+        }
+    
         return $this->response->setJSON($data);
     }
-
-    public function insert(){
-        $data['unit'] = $this->unitModel->findAll();
-        return $this->response->setJSON($data);
-    }
-
 
     public function create()
     {
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'mahasiswa_nim' => 'required',
+            'mahasiswa_nim' => 'required|is_not_unique[mahasiswa.nim]',
             'isi'           => 'required',
-            'unit_id'       => 'required'
+            'unit_id'       => 'required',
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
-            return $this->response->setJSON(['errors' => $validation->getErrors()]);
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $validation->getErrors()])->setStatusCode(422);
         }
 
         $this->aspirasiModel->insert([
             'mahasiswa_nim' => $this->request->getVar('mahasiswa_nim'),
             'isi'           => $this->request->getVar('isi'),
             'unit_id'       => $this->request->getVar('unit_id'),
-            'status'        => 'belum diproses',
+            'status'        => 'diproses',
             'created_at'    => date('Y-m-d H:i:s')
         ]);
 
-        return $this->response->setJSON(['message' => 'Aspirasi berhasil dikirim']);
+        return $this->response->setJSON(['status' => 'success']);
     }
 
     public function show($id){
         $data['aspirasi'] = $this->aspirasiModel->find($id);
-        $data['jawaban'] = $this->jawabanModel->where('aspirasi_id', $id)->first();
+        $data['jawaban'] = $this->jawabanModel->where('aspirasi_id', $id)->orderBy('created_at', 'asc')->findAll();
         return $this->response->setJSON($data);
     }
 
@@ -84,9 +87,9 @@ class AspirasiController extends BaseController
         }
 
         $this->aspirasiModel->update($id, [
+            'mahasiswa_nim'        => $this->request->getVar('mahasiswa_nim'),
             'isi'        => $this->request->getVar('isi'),
             'unit_id'    => $this->request->getVar('unit_id'),
-            'updated_at' => date('Y-m-d H:i:s')
         ]);
 
         return $this->response->setJSON(['message' => 'Aspirasi berhasil diupdate']);
