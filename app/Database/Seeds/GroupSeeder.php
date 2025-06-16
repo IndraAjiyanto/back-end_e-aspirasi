@@ -16,8 +16,17 @@ class GroupSeeder extends Seeder
         $groups->skipValidation(true); 
 
         $adminGroupID = $groups->insert([
-            'name' => 'admin',
-            'description' => 'Administrator',
+            'name' => 'akademik',
+            'description' => 'Akademik',
+        ]);
+
+        $adminGroupID = $groups->insert([
+            'name' => 'ppks',
+            'description' => 'PPKS',
+        ]);
+        $adminGroupID = $groups->insert([
+            'name' => 'sarpras',
+            'description' => 'Sarana & Prasarana',
         ]);
         
         $mahasiswaGroupID = $groups->insert([

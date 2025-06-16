@@ -10,6 +10,7 @@ class Mahasiswa extends Migration
     {
         $this->forge->addField([
             'id'         => ['type' => 'INT', 'constraint' => 11, 'auto_increment' => true],
+            'user_id' =>  ['type'=> 'INT', 'constraint' => 11, 'unsigned' => true],
             'nim'        => ['type' => 'VARCHAR', 'constraint' => 9],
             'nama'       => ['type' => 'VARCHAR', 'constraint' => 100],
             'kelas'      => ['type' => 'VARCHAR', 'constraint' => 10],
@@ -19,6 +20,7 @@ class Mahasiswa extends Migration
             'updated_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);
+	    $this->forge->addForeignKey('user_id', 'users', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addUniqueKey('nim');
         $this->forge->createTable('mahasiswa');
     }

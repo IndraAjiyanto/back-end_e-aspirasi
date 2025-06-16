@@ -52,7 +52,7 @@ class CreateUsersTable extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
-        $this->forge->addForeignKey('mahasiswa_id', 'mahasiswa', 'id', 'CASCADE', 'CASCADE');
+  
         $this->forge->createTable('users');
     }
 
