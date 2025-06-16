@@ -34,10 +34,6 @@ $routes->get('auth/activate', 'AuthController::activateAccount'); // Get request
 // $routes->post('/jawaban', 'JawabanController::create');
 // $routes->get('/jawaban/edit/(:num)', 'JawabanController::edit/$1');
 // $routes->post('/jawaban/update/(:num)', 'JawabanController::update/$1');
-<<<<<<< HEAD
-// $routes->post('/jawaban', 'JawabanController::delete');
 
-
-=======
 // $routes->post('/jawabanan', 'JawabanController::delete','updtstatsu');
->>>>>>> 81138c1162a29ad99658a02b9295ef5319272e00
+
