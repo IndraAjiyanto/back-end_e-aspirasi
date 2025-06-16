@@ -13,6 +13,8 @@
 
                     <form action="<?= url_to('register') ?>" method="post">
                         <?= csrf_field() ?>
+                        
+
 
                         <div class="form-group">
                             <label for="email"><?=lang('Auth.email')?></label>

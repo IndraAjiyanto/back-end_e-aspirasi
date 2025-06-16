@@ -39,7 +39,7 @@
 							<input type="password" name="password" class="form-control  <?php if (session('errors.password')) : ?>is-invalid<?php endif ?>" placeholder="<?=lang('Auth.password')?>">
 							<div class="invalid-feedback">
 								<?= session('errors.password') ?>
-							</div>
+						</div>
 						</div>
 
 <?php if ($config->allowRemembering): ?>

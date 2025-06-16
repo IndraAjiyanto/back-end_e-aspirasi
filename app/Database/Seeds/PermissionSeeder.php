@@ -4,27 +4,25 @@ namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
 
+use Myth\Auth\Models\PermissionModel;
+
 class PermissionSeeder extends Seeder
 {
     public function run()
     {
-        $data = [
-            'group-module',
-            'user-module'
-        ];
 
-foreach ($data as $value) {
-    $exists = $this->db->table('auth_permissions')
-        ->where('name', $value)
-        ->get()
-        ->getRow();
+        $permissions = new PermissionModel();
+        $permissions->skipValidation(true);
 
-    if (!$exists) {
-        $this->db->table('auth_permissions')->insert([
-            'name' => $value,
-            'description' => ''
+        $permissions->insert([
+            'name' => 'manage-users',
+            'description' => 'Manage all users'
+        ]);
+        
+        $permissions->insert([
+            'name' => 'create-aspirasi',
+            'description' => 'Create Aspirasi'
         ]);
     }
 }
-    }
-}
+

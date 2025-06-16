@@ -3,40 +3,43 @@
 namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
-use Myth\Auth\Models\GroupModel;
+
 use Myth\Auth\Models\PermissionModel;
+use Myth\Auth\Models\GroupModel;
 
 class GroupSeeder extends Seeder
 {
     public function run()
     {
-        $group = new GroupModel();
-        $permissions = new PermissionModel();
 
-        // Insert Superadmin
-        $group->insert([
+        $groups = new GroupModel();
+        $groups->skipValidation(true); 
+
+        $adminGroupID = $groups->insert([
             'name' => 'admin',
-            'description' => 'Level Dewa',
+            'description' => 'Administrator',
         ]);
-        $superadminID = $group->getInsertID();
-
-        // Insert Admin
-        $group->insert([
+        
+        $mahasiswaGroupID = $groups->insert([
             'name' => 'mahasiswa',
-            'description' => 'Level Raja',
+            'description' => 'Mahasiswa',
         ]);
-        $adminID = $group->getInsertID();
+        
 
-        // Assign semua permission ke Superadmin
-        $superadminPerms = $permissions->findAll();
-        foreach ($superadminPerms as $perm) {
-            $group->addPermissionToGroup($perm->id, $superadminID);
-        }
+        $permissions = new PermissionModel(); 
+        $permissions->skipValidation(true);
 
-        // Assign hanya 'user-module' ke Admin
-        $adminPerms = $permissions->where('name', 'user-module')->findAll();
-        foreach ($adminPerms as $perm) {
-            $group->addPermissionToGroup($perm->id, $adminID);
+        $allPermissions = $permissions->findAll();
+        
+        foreach ($allPermissions as $permission) {
+            $groups->addPermissionToGroup($permission->id, $adminGroupID);
         }
+        
+        $adminPermission = $permissions->where('name', 'user-module')->first();
+        if ($adminPermission) {
+            $groups->addPermissionToGroup($adminPermission->id, $mahasiswaGroupID);
+        }
+        
+
     }
 }

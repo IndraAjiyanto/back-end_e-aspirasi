@@ -14,12 +14,13 @@ class UserModel extends Model
 {
     protected $table          = 'users';
     protected $primaryKey     = 'id';
-    protected $returnType     = 'App\Entities\User';
+    protected $returnType     = 'array';
     protected $useSoftDeletes = true;
     protected $allowedFields  = [
-        'email', 'username', 'password_hash', 'reset_hash', 'reset_at', 'reset_expires', 'activate_hash',
-        'status', 'status_message', 'active', 'force_pass_reset', 'permissions', 'deleted_at',
-    ];
+        'username',
+        'email',
+        'password_hash',        
+        'mahasiswa_id',];
     protected $useTimestamps   = true;
     protected $validationRules = [
         'email'         => 'required|valid_email|is_unique[users.email,id,{id}]',
@@ -51,6 +52,15 @@ class UserModel extends Model
             'created_at' => date('Y-m-d H:i:s'),
         ]);
     }
+
+    public function getUserWithMahasiswa($id)
+{
+    return $this->select('users.*, mahasiswa.nama as nama_mahasiswa, mahasiswa.nim, mahasiswa.unit')
+                ->join('mahasiswa', 'mahasiswa.id = users.mahasiswa_id', 'left')
+                ->where('id', $id)
+                ->first();
+}
+
 
     /**
      * Logs an activation attempt for posterity sake.
