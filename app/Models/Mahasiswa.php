@@ -8,7 +8,7 @@ class Mahasiswa extends Model
 {
     protected $table            = 'mahasiswa';
     protected $primaryKey       = 'nim';
-    protected $useAutoIncrement = true;
+    protected $useAutoIncrement = false;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;

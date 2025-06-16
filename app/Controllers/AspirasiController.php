@@ -8,6 +8,8 @@ use App\Models\Aspirasi;
 use CodeIgniter\Controller;
 use App\Controllers\BaseController;
 use CodeIgniter\Exceptions\PageNotFoundException;
+use Myth\Auth\Entities\User;
+use Myth\Auth\Models\UserModel;
 
 class AspirasiController extends BaseController
 {
@@ -115,5 +117,26 @@ class AspirasiController extends BaseController
         ]);
 
         return $this->response->setJSON(['message' => 'Status aspirasi berhasil diperbarui']);
+    }
+    public function myAspirasi()
+    {
+    $user = auth()->user();
+    if (!$user) {
+        return $this->response->setStatusCode(401)->setJSON(['message' => 'Unauthorized']);
+    }
+
+    // Ambil mahasiswa_id dari user
+    $userModel = new UserModel();
+    $userData = $userModel->find($user->id);
+    $mahasiswa_id = $userData->mahasiswa_id;
+
+    // Cek NIM mahasiswa dari tabel mahasiswa
+    $db = \Config\Database::connect();
+    $mahasiswa = $db->table('mahasiswa')->where('id', $mahasiswa_id)->get()->getRow();
+
+    // Cari aspirasi berdasarkan nim
+    $aspirasi = $this->aspirasiModel->where('mahasiswa_nim', $mahasiswa->nim)->findAll();
+
+    return $this->response->setJSON(['aspirasi' => $aspirasi]);
     }
 }
