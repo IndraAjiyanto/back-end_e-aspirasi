@@ -35,7 +35,12 @@ class CreateUsersTable extends Migration
             'mahasiswa_id' => [
                 'type'       => 'INT',
                 'constraint' => 11,
+                'null'       => true,
             ],
+                    'deleted_at' => [
+            'type' => 'DATETIME',
+            'null' => true,
+        ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -51,8 +56,11 @@ class CreateUsersTable extends Migration
         $this->forge->createTable('users');
     }
 
-    public function down()
-    {
+public function down()
+{
+    if ($this->db->tableExists('users')) {
         $this->forge->dropTable('users');
     }
+}
+
 }

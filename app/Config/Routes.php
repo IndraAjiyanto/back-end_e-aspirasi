@@ -19,14 +19,11 @@ $routes->get('/unit/aspirasi/(:num)','UnitController::getAspirasiUnit/$1');
 $routes->resource('unit', ['controller' => 'UnitController']);
 // $routes->resource('auth', ['controller' => 'AuthController']);
 
-$routes->post('auth/login', 'AuthController::attemptLogin'); // Post request for login
-$routes->get('auth/register', 'AuthController::register');
 
-$routes->post('auth/register', 'AuthController::attemptRegister'); // Post request for registration
-$routes->get('auth/logout', 'AuthController::logout'); // Get request for logout
-$routes->post('auth/forgot-password', 'AuthController::attemptForgot'); // Post request for forgot password
-$routes->post('auth/reset-password', 'AuthController::attemptReset'); // Post request for password reset
-$routes->get('auth/activate', 'AuthController::activateAccount'); // Get request for account activation
+$routes->post('/login', 'AuthController::login');
+$routes->post('/register', 'AuthController::register');
+$routes->post('/logout', 'AuthController::logout');
+// Get request for account activation
 
 
 

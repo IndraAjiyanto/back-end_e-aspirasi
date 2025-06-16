@@ -154,28 +154,51 @@ class CreateAuthTables extends Migration
 
     //--------------------------------------------------------------------
 
-    public function down()
-    {
-        // drop constraints first to prevent errors
-        if ($this->db->DBDriver !== 'SQLite3') { // @phpstan-ignore-line
+public function down()
+{
+    // Drop constraints first to prevent errors
+    if ($this->db->DBDriver !== 'SQLite3') {
+
+        // Drop foreign key dari auth_tokens (tabel akan di-drop di bawah)
+        if ($this->db->tableExists('auth_tokens')) {
             $this->forge->dropForeignKey('auth_tokens', 'auth_tokens_user_id_foreign');
+        }
+
+        if ($this->db->tableExists('auth_groups_permissions')) {
             $this->forge->dropForeignKey('auth_groups_permissions', 'auth_groups_permissions_group_id_foreign');
             $this->forge->dropForeignKey('auth_groups_permissions', 'auth_groups_permissions_permission_id_foreign');
+        }
+
+        if ($this->db->tableExists('auth_groups_users')) {
             $this->forge->dropForeignKey('auth_groups_users', 'auth_groups_users_group_id_foreign');
             $this->forge->dropForeignKey('auth_groups_users', 'auth_groups_users_user_id_foreign');
+        }
+
+        if ($this->db->tableExists('auth_users_permissions')) {
             $this->forge->dropForeignKey('auth_users_permissions', 'auth_users_permissions_user_id_foreign');
             $this->forge->dropForeignKey('auth_users_permissions', 'auth_users_permissions_permission_id_foreign');
         }
-
-        $this->forge->dropTable('users', true);
-        $this->forge->dropTable('auth_logins', true);
-        $this->forge->dropTable('auth_tokens', true);
-        $this->forge->dropTable('auth_reset_attempts', true);
-        $this->forge->dropTable('auth_activation_attempts', true);
-        $this->forge->dropTable('auth_groups', true);
-        $this->forge->dropTable('auth_permissions', true);
-        $this->forge->dropTable('auth_groups_permissions', true);
-        $this->forge->dropTable('auth_groups_users', true);
-        $this->forge->dropTable('auth_users_permissions', true);
     }
+
+    // Drop all tables if they exist
+    $tables = [
+        'auth_users_permissions',
+        'auth_groups_users',
+        'auth_groups_permissions',
+        'auth_permissions',
+        'auth_groups',
+        'auth_activation_attempts',
+        'auth_reset_attempts',
+        'auth_tokens',
+        'auth_logins',
+        'users'
+    ];
+
+    foreach ($tables as $table) {
+        if ($this->db->tableExists($table)) {
+            $this->forge->dropTable($table, true);
+        }
+    }
+}
+
 }
