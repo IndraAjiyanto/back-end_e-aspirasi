@@ -39,7 +39,7 @@ class JawabanController extends BaseController
 
         $prosesJawab = $this->jawabanModel->insert([
             'isi'           => $this->request->getVar('isi'),
-            'aspirasi_id'       => $this->request->getVar('aspirasi_id'),
+            'aspirasi_id'   => $this->request->getVar('aspirasi_id'),
             'created_at'    => date('Y-m-d H:i:s')
         ]);
 

@@ -65,6 +65,7 @@ class AspirasiController extends BaseController
     public function show($id){
         $data['aspirasi'] = $this->aspirasiModel->find($id);
         $data['jawaban'] = $this->jawabanModel->where('aspirasi_id', $id)->orderBy('created_at', 'asc')->findAll();
+        $data['unit'] = $this->unitModel->find($data['aspirasi']['unit_id']);
         return $this->response->setJSON($data);
     }
 
