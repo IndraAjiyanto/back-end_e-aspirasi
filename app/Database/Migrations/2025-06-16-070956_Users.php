@@ -32,11 +32,6 @@ class CreateUsersTable extends Migration
                 'constraint' => 1,
                 'default'    => 1,
             ],
-            'mahasiswa_id' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => true,
-            ],
                     'deleted_at' => [
             'type' => 'DATETIME',
             'null' => true,
