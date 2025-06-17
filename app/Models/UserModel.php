@@ -19,8 +19,7 @@ class UserModel extends Model
     protected $allowedFields  = [
         'username',
         'email',
-        'password_hash',        
-        'mahasiswa_id',];
+        'password_hash',];
     protected $useTimestamps   = true;
     protected $validationRules = [
         'email'         => 'required|valid_email|is_unique[users.email,id,{id}]',
@@ -53,13 +52,14 @@ class UserModel extends Model
         ]);
     }
 
-    public function getUserWithMahasiswa($id)
+public function getUserWithMahasiswa($id)
 {
-    return $this->select('users.*, mahasiswa.nama as nama_mahasiswa, mahasiswa.nim, mahasiswa.unit')
-                ->join('mahasiswa', 'mahasiswa.id = users.mahasiswa_id', 'left')
-                ->where('id', $id)
+    return $this->select('users.*, mahasiswa.nama as nama_mahasiswa, mahasiswa.nim, mahasiswa.kelas, mahasiswa.prodi, mahasiswa.jurusan')
+                ->join('mahasiswa', 'mahasiswa.user_id = users.id', 'left')
+                ->where('users.id', $id)
                 ->first();
 }
+
 
 
     /**

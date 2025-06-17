@@ -94,22 +94,20 @@ public function register()
         return $this->failValidationErrors($this->validator->getErrors());
     }
 
-    $password = $this->request->getJsonVar('password');
-    // Simpan user
-    $user = new User([
+    // Gunakan Entity User agar Myth:Auth otomatis hash password
+    $userEntity = new User([
         'username' => $this->request->getJsonVar('username'),
         'email'    => $this->request->getJsonVar('email'),
-        'password' => password_hash($password, PASSWORD_DEFAULT),
+        'password' => $this->request->getJsonVar('password'), // plain password
         'active'   => 1
     ]);
 
-    if (!$this->userModel->save($user)) {
+    if (!$this->userModel->save($userEntity)) {
         return $this->failServerError('Gagal menyimpan user: ' . json_encode($this->userModel->errors()));
     }
 
-    $userId = $this->userModel->getInsertID();
+    $userId = $this->userModel->getInsertID(); // Ambil ID user yang baru dibuat
 
-    // Simpan data mahasiswa
     $mahasiswa = [
         'nim'     => $this->request->getJsonVar('nim'),
         'nama'    => $this->request->getJsonVar('nama'),
@@ -123,10 +121,10 @@ public function register()
         return $this->failServerError('Gagal menyimpan data mahasiswa: ' . json_encode($this->mahasiswaModel->errors()));
     }
 
-    // Masukkan ke grup "mahasiswa"
+    // Masukkan user ke grup mahasiswa
     $this->db->table('auth_groups_users')->insert([
         'user_id'  => $userId,
-        'group_id' => 4 // id grup mahasiswa
+        'group_id' => 4
     ]);
 
     return $this->respondCreated([
@@ -134,5 +132,7 @@ public function register()
         'message' => 'Registrasi berhasil',
     ]);
 }
+
+
 
 }
