@@ -6,31 +6,39 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
-// $routes->get('/aspirasi', 'AspirasiController::index');
-// $routes->post('/aspirasi', 'AspirasiController::create');
-// $routes->get('/aspirasi/edit/(:num)', 'AspirasiController::edit/$1');
-// $routes->post('/aspirasi/update/(:num)', 'AspirasiController::update/$1');
-// $routes->post('/aspirasi/delete/(:num)', 'AspirasiController::delete/$1');
-// $routes->post('/aspirasi/status/(:num)', 'AspirasiController::updateStatus/$1');
-$routes->resource('aspirasi', ['controller' => 'AspirasiController']);
-$routes->get('/jawaban/aspirasi/(:num)', 'JawabanController::jawabanUnit/$1');
-$routes->resource('jawaban', ['controller' => 'JawabanController']);
-$routes->get('/unit/aspirasi/(:num)','UnitController::getAspirasiUnit/$1');
-$routes->resource('unit', ['controller' => 'UnitController']);
-// $routes->resource('auth', ['controller' => 'AuthController']);
-
-
 $routes->post('/login', 'AuthController::login');
 $routes->post('/register', 'AuthController::register');
 $routes->post('/logout', 'AuthController::logout');
-// Get request for account activation
+$routes->get('/blocked', 'Home::blocked');
 
 
+//Untuk Mahasiswa
+$routes->group('mahasiswa', ['filter' => 'role:mahasiswa'], function($routes) {
+    $routes->resource('aspirasi', ['controller' => 'AspirasiController']);
+    $routes->get('dashboard', 'MahasiswaController::dashboard');
+});
 
-// $routes->get('/jawaban', 'JawabanController::index');
-// $routes->post('/jawaban', 'JawabanController::create');
-// $routes->get('/jawaban/edit/(:num)', 'JawabanController::edit/$1');
-// $routes->post('/jawaban/update/(:num)', 'JawabanController::update/$1');
+//Untuk PPKS
+$routes->group('ppks', ['filter' => 'role:ppks'], function($routes) {
+    $routes->get('aspirasi/(:num)', 'UnitController::getAspirasiUnit/$1');
+    $routes->get('dashboard', 'UnitController::dashboardPpks');
+});
 
-// $routes->post('/jawabanan', 'JawabanController::delete','updtstatsu');
+//Untuk Sarpras
+$routes->group('sarpras', ['filter' => 'role:sarpras'], function($routes) {
+    $routes->get('aspirasi/(:num)', 'UnitController::getAspirasiUnit/$1');
+    $routes->get('dashboard', 'UnitController::dashboardSarpras');
+});
+
+//Untuk Akademik
+$routes->group('akademik', ['filter' => 'role:akademik'], function($routes) {
+    $routes->get('aspirasi/(:num)', 'UnitController::getAspirasiUnit/$1');
+    $routes->get('dashboard', 'UnitController::dashboardAkademik');
+});
+
+//Jawaban (Umum)
+$routes->group('unit', ['filter' => 'role:mahasiswa,ppks,sarpras,akademik'], function($routes) {
+    $routes->resource('jawaban', ['controller' => 'JawabanController']);
+    $routes->get('jawaban/aspirasi/(:num)', 'JawabanController::jawabanUnit/$1');
+});
 
