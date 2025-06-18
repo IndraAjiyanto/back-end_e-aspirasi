@@ -38,6 +38,7 @@ class Filters extends BaseFilters
         'login'      => \Myth\Auth\Filters\LoginFilter::class,
         // 'role'       => \Myth\Auth\Filters\RoleFilter::class,
         'jwt' => \App\Filters\JWTFilter::class,
+        'guest' => \App\Filters\GuestJWTFilter::class,
         'permission' => \Myth\Auth\Filters\PermissionFilter::class,
     ];
 
