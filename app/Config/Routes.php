@@ -14,6 +14,7 @@ $routes->get('/blocked', 'Home::blocked');
 
 //Untuk Mahasiswa
 $routes->group('mahasiswa', ['filter' => 'jwt:mahasiswa'], function($routes) {
+    $routes->get('aspirasi/all/(:num)', 'AspirasiController::getAspirasi/$1');
     $routes->resource('aspirasi', ['controller' => 'AspirasiController']);
     $routes->get('unit', 'UnitController::index');
     // $routes->resource('dashboard', 'MahasiswaController::dashboard');

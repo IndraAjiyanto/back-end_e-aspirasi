@@ -97,24 +97,50 @@ class AspirasiController extends BaseController
         return $this->response->setJSON(['message' => 'Aspirasi berhasil dihapus']);
     }
 
-public function index()
+public function getAspirasi($id)
 {
-
-
     $data = [];
 
-    $aspirasis = $this->aspirasiModel->findAll();
+    // Cari data mahasiswa berdasarkan user_id
+    $mahasiswa = $this->mahasiswaModel->where('user_id', $id)->first();
+
+    if (!$mahasiswa) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Mahasiswa tidak ditemukan',
+        ]);
+    }
+
+    // Ambil semua aspirasi milik mahasiswa tersebut
+    $aspirasis = $this->aspirasiModel
+        ->where('mahasiswa_id', $mahasiswa['id'])
+        ->findAll();
+
     foreach ($aspirasis as $aspirasi) {
-            $unit = $this->unitModel->find($aspirasi['unit_id']);
-             $aspirasi['unit_nama'] = $unit ? $unit['nama'] : 'Tidak diketahui';
-             $data[] = $aspirasi;
-         }
+        // Ambil data unit
+        $unit = $this->unitModel->find($aspirasi['unit_id']);
+
+        // Cek apakah aspirasi sudah dijawab
+        $jawaban = $this->jawabanModel->where('aspirasi_id', $aspirasi['id'])->first();
+
+        if (!$jawaban && $aspirasi['status'] !== 'diproses') {
+            // Update status di database jika belum diproses
+            $this->aspirasiModel->update($aspirasi['id'], ['status' => 'diproses']);
+            $aspirasi['status'] = 'diproses';
+        }
+
+        // Tambahkan nama unit ke data aspirasi
+        $aspirasi['unit_nama'] = $unit ? $unit['nama'] : 'Tidak diketahui';
+
+        $data[] = $aspirasi;
+    }
 
     return $this->response->setJSON([
         'status' => 'success',
         'aspirasi' => $data,
     ]);
 }
+
 
 
 }
