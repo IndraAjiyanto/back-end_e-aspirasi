@@ -2,12 +2,15 @@
 
 namespace App\Controllers;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use App\Models\UserModel;
 use CodeIgniter\Controller;
+use Psr\Log\LoggerInterface;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Class BaseController
@@ -55,4 +58,47 @@ abstract class BaseController extends Controller
 
         // E.g.: $this->session = service('session');
     }
+
+protected function getAuthenticatedUser()
+{
+    // Ambil header Authorization
+    $authHeader = $this->request->getHeaderLine('Authorization');
+
+    if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        $this->response->setStatusCode(401)->setJSON(['message' => 'Unauthorized'])->send();
+        exit;
+    }
+
+    $token = $matches[1];
+    $secretKey = getenv('JWT_SECRET'); // atau env('JWT_SECRET') kalau kamu punya helper env()
+// Ganti dengan secret key JWT kamu
+
+    try {
+        // Decode token JWT
+        $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+
+        // Ambil user id dari token, misal di claim 'sub'
+        $userId = $decoded->sub ?? null;
+        if (!$userId) {
+            throw new \Exception('Invalid token payload');
+        }
+
+        // Cari user di database
+        $userModel = new UserModel();
+        $user = $userModel->find($userId);
+
+        if (!$user) {
+            $this->response->setStatusCode(401)->setJSON(['message' => 'Unauthorized'])->send();
+            exit;
+        }
+
+        // Return data user (bisa array/object sesuai model)
+        return $user;
+
+    } catch (\Exception $e) {
+        $this->response->setStatusCode(401)->setJSON(['message' => 'Unauthorized'])->send();
+        exit;
+    }
+
+}
 }

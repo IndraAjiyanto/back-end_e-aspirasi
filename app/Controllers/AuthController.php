@@ -2,137 +2,111 @@
 
 namespace App\Controllers;
 
-use Config\Database;
+use App\Models\UserModel;
 use App\Models\Mahasiswa;
-use Myth\Auth\Entities\User;
-use Myth\Auth\Models\UserModel;
 use CodeIgniter\RESTful\ResourceController;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class AuthController extends ResourceController
 {
     protected $format = 'json';
-    protected $auth;
-    protected $config;
-    protected $users;
     protected $userModel;
     protected $mahasiswaModel;
-    protected $db;
+    protected $key;
 
     public function __construct()
     {
-        $this->auth = service('authentication');
-        $this->config = config('Auth');
-        $this->users = model(UserModel::class);
         $this->userModel = new UserModel();
         $this->mahasiswaModel = new Mahasiswa();
-        $this->db = Database::connect();
+        $this->key = getenv('JWT_SECRET');
+    }
+
+    private function generateJWT($user)
+    {
+        $payload = [
+            'iat' => time(),
+            'exp' => time() + 3600,
+            'uid' => $user['id'],
+            'username' => $user['username'],
+            'role' => $user['role']
+        ];
+
+        return JWT::encode($payload, $this->key, 'HS256');
     }
 
     public function login()
     {
+        $username = $this->request->getJSON()->username ?? '';
+        $password = $this->request->getJSON()->password ?? '';
+
+        $user = $this->userModel->where('username', $username)->first();
+
+        if (!$user || !password_verify($password, $user['password'])) {
+            return $this->failUnauthorized('Username atau password salah.');
+        }
+
+        $token = $this->generateJWT($user);
+
+        return $this->respond([
+            'status' => 'success',
+            'token' => $token,
+            'user' => [
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'email' => $user['email'],
+                'role' => $user['role']
+            ]
+        ]);
+    }
+
+    public function register()
+    {
+        $data = $this->request->getJSON();
+
         $rules = [
-            'username' => 'required',
-            'password' => 'required',
+            'username' => 'required|is_unique[users.username]',
+            'email' => 'required|valid_email|is_unique[users.email]',
+            'password' => 'required|min_length[6]',
+            'nim' => 'required|is_unique[mahasiswa.nim]',
+            'nama' => 'required',
+            'kelas' => 'required',
+            'prodi' => 'required',
+            'jurusan' => 'required'
         ];
 
         if (!$this->validate($rules)) {
             return $this->failValidationErrors($this->validator->getErrors());
         }
 
-        $login = $this->request->getJsonVar('username') ?? $this->request->getPost('username');
-        $password = $this->request->getJsonVar('password') ?? $this->request->getPost('password');
-        $type = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $userData = [
+            'username' => $data->username,
+            'email' => $data->email,
+            'password' => password_hash($data->password, PASSWORD_DEFAULT),
+            'role' => 'mahasiswa'
+        ];
 
-        if (!$this->auth->attempt([$type => $login, 'password' => $password])) {
-            return $this->failUnauthorized('Login gagal. Username atau password salah.');
-        }
+        if (!$this->userModel->insert($userData)) {
+    return $this->failServerError('Gagal membuat user.');
+}
 
-        $user = $this->auth->user();
+$userId = $this->userModel->getInsertID(); 
 
-        return $this->respond([
-            'status' => 'success',
-            'message' => 'Login berhasil',
-            'user' => [
-                'id' => $user->id,
-                'username' => $user->username,
-                'email' => $user->email,
-            ],
-            'token' => session()->get('__ci_last_regenerate'), // opsional token
+        $this->mahasiswaModel->insert([
+            'nim' => $data->nim,
+            'nama' => $data->nama,
+            'kelas' => $data->kelas,
+            'prodi' => $data->prodi,
+            'jurusan' => $data->jurusan,
+            'user_id' => $userId
         ]);
+
+        return $this->respondCreated(['message' => 'Registrasi berhasil']);
     }
 
     public function logout()
     {
-        if ($this->auth->check()) {
-            $this->auth->logout();
-            session()->destroy();
-        }
-
-        return $this->respond(['message' => 'Logout berhasil']);
+        // JWT logout tidak perlu server-side kecuali pakai blacklist
+        return $this->respond(['message' => 'Logout berhasil (hapus token di frontend)']);
     }
-
-public function register()
-{
-    $rulesUser = [
-        'username'     => 'required|min_length[5]|is_unique[users.username]',
-        'email'        => 'required|valid_email|is_unique[users.email]',
-        'password'     => 'required|min_length[8]',
-        'pass_confirm' => 'required|matches[password]',
-    ];
-
-    $rulesMahasiswa = [
-        'nim'     => 'required|min_length[5]|is_unique[mahasiswa.nim]',
-        'nama'    => 'required|min_length[3]',
-        'kelas'   => 'required|min_length[3]',
-        'prodi'   => 'required',
-        'jurusan' => 'required',
-    ];
-
-    $rules = array_merge($rulesUser, $rulesMahasiswa);
-
-    if (!$this->validate($rules)) {
-        return $this->failValidationErrors($this->validator->getErrors());
-    }
-
-    // Gunakan Entity User agar Myth:Auth otomatis hash password
-    $userEntity = new User([
-        'username' => $this->request->getJsonVar('username'),
-        'email'    => $this->request->getJsonVar('email'),
-        'password' => $this->request->getJsonVar('password'), // plain password
-        'active'   => 1
-    ]);
-
-    if (!$this->userModel->save($userEntity)) {
-        return $this->failServerError('Gagal menyimpan user: ' . json_encode($this->userModel->errors()));
-    }
-
-    $userId = $this->userModel->getInsertID(); // Ambil ID user yang baru dibuat
-
-    $mahasiswa = [
-        'nim'     => $this->request->getJsonVar('nim'),
-        'nama'    => $this->request->getJsonVar('nama'),
-        'kelas'   => $this->request->getJsonVar('kelas'),
-        'prodi'   => $this->request->getJsonVar('prodi'),
-        'jurusan' => $this->request->getJsonVar('jurusan'),
-        'user_id' => $userId,
-    ];
-
-    if (!$this->mahasiswaModel->save($mahasiswa)) {
-        return $this->failServerError('Gagal menyimpan data mahasiswa: ' . json_encode($this->mahasiswaModel->errors()));
-    }
-
-    // Masukkan user ke grup mahasiswa
-    $this->db->table('auth_groups_users')->insert([
-        'user_id'  => $userId,
-        'group_id' => 4
-    ]);
-
-    return $this->respondCreated([
-        'status'  => 'success',
-        'message' => 'Registrasi berhasil',
-    ]);
-}
-
-
-
 }

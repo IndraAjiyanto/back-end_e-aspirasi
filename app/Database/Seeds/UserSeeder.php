@@ -3,94 +3,85 @@
 namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
-use Myth\Auth\Models\UserModel;
-use Myth\Auth\Models\GroupModel;
-use Myth\Auth\Password;
+use CodeIgniter\I18n\Time;
 
 class UserSeeder extends Seeder
 {
-public function run()
-{
-    $userModel  = new UserModel();
-    $groupModel = new GroupModel();
+    public function run()
+    {
+        $defaultPassword = password_hash('12345678', PASSWORD_BCRYPT);
 
-    $defaultPassword = Password::hash('12345678');
+        // Akun unit (role = akademik, ppks, sarpras)
+        $unitAccounts = [
+            ['username' => 'Akademik', 'email' => 'akademik@example.com', 'role' => 'akademik'],
+            ['username' => 'PPKS',     'email' => 'ppks@example.com',     'role' => 'ppks'],
+            ['username' => 'Sarpras',  'email' => 'sarpras@example.com',  'role' => 'sarpras'],
+        ];
 
-    $groups = [
-        'akademik' => null,
-        'ppks'     => null,
-        'sarpras'  => null,
-        'mahasiswa'=> null,
-    ];
+        foreach ($unitAccounts as $unit) {
+            $this->db->table('users')->insert([
+                'username'       => $unit['username'],
+                'email'      => $unit['email'],
+                'password'   => $defaultPassword,
+                'role'       => $unit['role'],
+                'created_at' => Time::now(),
+                'updated_at' => Time::now(),
+            ]);
 
-    // Ambil semua ID grup
-    foreach ($groups as $name => &$id) {
-        $group = $this->db->table('auth_groups')->where('name', $name)->get()->getRow();
-        if (!$group) throw new \Exception("Grup '$name' tidak ditemukan!");
-        $id = $group->id;
-    }
+            $userID = $this->db->insertID();
 
-    // Insert unit users
-    $unitAccounts = [
-        ['username' => 'akademik', 'email' => 'akademik@example.com', 'group' => $groups['akademik']],
-        ['username' => 'ppks',     'email' => 'ppks@example.com',     'group' => $groups['ppks']],
-        ['username' => 'sarpras',  'email' => 'sarpras@example.com',  'group' => $groups['sarpras']],
-    ];
+            $this->db->table('unit')->insert([
+                'user_id' => $userID,
+                'nama'    => $unit['username']
+            ]);
+        }
 
-    foreach ($unitAccounts as $account) {
-        $userModel->insert([
-            'username'      => $account['username'],
-            'email'         => $account['email'],
-            'password_hash' => $defaultPassword,
-            'active'        => 1
-        ]);
-        $groupModel->addUserToGroup($userModel->getInsertID(), $account['group']);
-    }
-
-    // Mahasiswa
-    $mahasiswaList = [
-        [
-            'username' => 'mawar01',
-            'email'    => 'mawar01@example.com',
-            'mahasiswa'=> [
-                'nim'     => '230001',
-                'nama'    => 'Mawar',
-                'kelas'   => 'TI-1A',
-                'prodi'   => 'Teknik Informatika',
-                'jurusan' => 'Informatika',
+        // Akun mahasiswa
+        $mahasiswaList = [
+            [
+                'username'     => 'Mawar',
+                'email'    => 'mawar01@example.com',
+                'role'     => 'mahasiswa',
+                'mahasiswa'=> [
+                    'nim'     => '230001',
+                    'nama'    => 'Mawar',
+                    'kelas'   => 'TI-1A',
+                    'prodi'   => 'Teknik Informatika',
+                    'jurusan' => 'Informatika',
+                ]
+            ],
+            [
+                'username'     => 'Budi',
+                'email'    => 'budi02@example.com',
+                'role'     => 'mahasiswa',
+                'mahasiswa'=> [
+                    'nim'     => '230002',
+                    'nama'    => 'Budi',
+                    'kelas'   => 'TI-1B',
+                    'prodi'   => 'Teknik Informatika',
+                    'jurusan' => 'Informatika',
+                ]
             ]
-        ],
-        [
-            'username' => 'budi02',
-            'email'    => 'budi02@example.com',
-            'mahasiswa'=> [
-                'nim'     => '230002',
-                'nama'    => 'Budi',
-                'kelas'   => 'TI-1B',
-                'prodi'   => 'Teknik Informatika',
-                'jurusan' => 'Informatika',
-            ]
-        ]
-    ];
+        ];
 
-    foreach ($mahasiswaList as $mhs) {
-        $userModel->insert([
-            'username'      => $mhs['username'],
-            'email'         => $mhs['email'],
-            'password_hash' => $defaultPassword,
-            'active'        => 1
-        ]);
+        foreach ($mahasiswaList as $mhs) {
+            $this->db->table('users')->insert([
+                'username'       => $mhs['username'],
+                'email'      => $mhs['email'],
+                'password'   => $defaultPassword,
+                'role'       => $mhs['role'],
+                'created_at' => Time::now(),
+                'updated_at' => Time::now(),
+            ]);
 
-        $userID = $userModel->getInsertID();
-        $groupModel->addUserToGroup($userID, $groups['mahasiswa']);
+            $userID = $this->db->insertID();
 
-        $mhsData = $mhs['mahasiswa'];
-        $mhsData['user_id'] = $userID;
+            $mhsData = $mhs['mahasiswa'];
+            $mhsData['user_id'] = $userID;
 
-        $this->db->table('mahasiswa')->insert($mhsData);
+            $this->db->table('mahasiswa')->insert($mhsData);
+        }
+
+        echo "Seeder JWT manual berhasil dijalankan! ✅\n";
     }
-
-    echo "Seeder berhasil dijalankan! 🎉\n";
-}
-
 }

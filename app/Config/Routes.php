@@ -13,32 +13,35 @@ $routes->get('/blocked', 'Home::blocked');
 
 
 //Untuk Mahasiswa
-$routes->group('mahasiswa', ['filter' => 'role:mahasiswa'], function($routes) {
+$routes->group('mahasiswa', ['filter' => 'jwt:mahasiswa'], function($routes) {
     $routes->resource('aspirasi', ['controller' => 'AspirasiController']);
-    $routes->get('dashboard', 'MahasiswaController::dashboard');
+    $routes->get('unit', 'UnitController::index');
+    // $routes->resource('dashboard', 'MahasiswaController::dashboard');
 });
 
+
 //Untuk PPKS
-$routes->group('ppks', ['filter' => 'role:ppks'], function($routes) {
-    $routes->get('aspirasi/(:num)', 'UnitController::getAspirasiUnit/$1');
+$routes->group('ppks', ['filter' => 'jwt:ppks'], function($routes) {
+    $routes->get('aspirasi/all/(:num)', 'UnitController::getAspirasiUnit/$1');
     $routes->get('dashboard', 'UnitController::dashboardPpks');
+    $routes->get('aspirasi/(:num)', 'AspirasiController::show/$1');
 });
 
 //Untuk Sarpras
-$routes->group('sarpras', ['filter' => 'role:sarpras'], function($routes) {
-    $routes->get('aspirasi/(:num)', 'UnitController::getAspirasiUnit/$1');
+$routes->group('sarpras', ['filter' => 'jwt:sarpras'], function($routes) {
+    $routes->get('aspirasi/all/(:num)', 'UnitController::getAspirasiUnit/$1');
     $routes->get('dashboard', 'UnitController::dashboardSarpras');
+    $routes->get('aspirasi/(:num)', 'AspirasiController::show/$1');
 });
 
 //Untuk Akademik
-$routes->group('akademik', ['filter' => 'role:akademik'], function($routes) {
-    $routes->get('aspirasi/(:num)', 'UnitController::getAspirasiUnit/$1');
+$routes->group('akademik', ['filter' => 'jwt:akademik'], function($routes) {
+    $routes->get('aspirasi/all/(:num)', 'UnitController::getAspirasiUnit/$1');
     $routes->get('dashboard', 'UnitController::dashboardAkademik');
+    $routes->get('aspirasi/(:num)', 'AspirasiController::show/$1');
 });
 
 //Jawaban (Umum)
-$routes->group('unit', ['filter' => 'role:mahasiswa,ppks,sarpras,akademik'], function($routes) {
+$routes->group('unit', ['filter' => 'jwt:ppks,sarpras,akademik'], function($routes) {
     $routes->resource('jawaban', ['controller' => 'JawabanController']);
-    $routes->get('jawaban/aspirasi/(:num)', 'JawabanController::jawabanUnit/$1');
 });
-
