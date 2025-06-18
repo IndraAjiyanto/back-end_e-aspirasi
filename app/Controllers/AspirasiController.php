@@ -100,15 +100,9 @@ class AspirasiController extends BaseController
 public function index()
 {
 
-    // $mahasiswa = $this->mahasiswaModel->where('user_id', $user->id)->first();
-
-    // if (!$mahasiswa) {
-    //     return $this->response->setStatusCode(404)->setJSON(['message' => 'Data mahasiswa tidak ditemukan']);
-    // }
 
     $data = [];
 
-    // $aspirasis = $this->aspirasiModel->where('mahasiswa_id', $mahasiswa->id)->findAll();
     $aspirasis = $this->aspirasiModel->findAll();
     foreach ($aspirasis as $aspirasi) {
             $unit = $this->unitModel->find($aspirasi['unit_id']);
@@ -119,7 +113,6 @@ public function index()
     return $this->response->setJSON([
         'status' => 'success',
         'aspirasi' => $data,
-        // 'mahasiswa' => $mahasiswa
     ]);
 }
 
