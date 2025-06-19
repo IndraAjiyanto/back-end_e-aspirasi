@@ -25,7 +25,7 @@ class AspirasiController extends BaseController
         $this->unitModel = new Unit();
         $this->jawabanModel = new Jawaban();
         $this->mahasiswaModel = new Mahasiswa();
-    }
+    }    
 
 
     public function create()
@@ -140,7 +140,4 @@ public function getAspirasi($id)
         'aspirasi' => $data,
     ]);
 }
-
-
-
 }
